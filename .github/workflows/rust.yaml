@@ -15,8 +15,5 @@ jobs:
 
       - uses: Swatinem/rust-cache@v1
 
-      - name: check open files limit
-        run: ulimit -n
-
-      - name: set open files limit and run tests
-        run: ulimit -n 2048 && cargo test -v
+      - name: Run tests
+        run: cargo test send
