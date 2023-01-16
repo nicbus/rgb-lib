@@ -104,9 +104,7 @@ fn up_to_allocation_checks() {
     if MAX_ALLOCATIONS_PER_UTXO > 2 {
         drain_wallet(&wallet, online.clone());
         fund_wallet(wallet.get_address());
-        wallet._sync_db_txos().unwrap();
         fund_wallet(rcv_wallet.get_address());
-        rcv_wallet._sync_db_txos().unwrap();
 
         let num_utxos_created = wallet
             .create_utxos(online.clone(), true, Some(2), None)
@@ -202,7 +200,6 @@ fn fail() {
     wallet
         .create_utxos(online.clone(), false, None, None)
         .unwrap();
-    wallet._sync_db_txos().unwrap();
 
     // don't create UTXOs if enough allocations are already available
     let result = wallet.create_utxos(online, true, None, None);

@@ -3133,7 +3133,6 @@ fn insufficient_bitcoins() {
 
     // create 1 UTXO for change (add funds, create UTXO, drain the rest)
     fund_wallet(wallet.get_address());
-    wallet._sync_db_txos().unwrap();
     let num_utxos_created = wallet
         .create_utxos(online.clone(), false, Some(1), Some(tiny_btc_amount))
         .unwrap();

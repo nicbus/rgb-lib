@@ -26,7 +26,6 @@ fn success() {
 
     drain_wallet(&wallet, online.clone());
     fund_wallet(wallet.get_address());
-    mine(false);
     wallet
         .create_utxos(online.clone(), false, None, None)
         .unwrap();
