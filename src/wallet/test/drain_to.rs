@@ -20,9 +20,7 @@ fn success() {
 
     // issue asset (to produce an RGB allocation)
     fund_wallet(wallet.get_address());
-    wallet
-        .create_utxos(online.clone(), false, None, None)
-        .unwrap();
+    test_create_utxos_default(&mut wallet, online.clone());
     wallet
         .issue_asset_rgb20(
             online.clone(),
