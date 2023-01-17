@@ -1360,32 +1360,10 @@ impl Wallet {
         info!(self.logger, "Creating UTXOs...");
         self._check_xprv()?;
 
-        let delay = 100;
-        let mut retries = 3;
-        let mut unsigned_psbt = None;
-        while retries > 0 {
-            retries -= 1;
-            let result = self.create_utxos_begin(online.clone(), up_to, num, size);
-            match result {
-                Ok(psbt) => {
-                    unsigned_psbt = Some(psbt);
-                    break;
-                }
-                Err(Error::InsufficientBitcoins) => {
-                    std::thread::sleep(Duration::from_millis(delay));
-                    continue;
-                }
-                Err(error) => {
-                    return Err(error);
-                }
-            }
-        }
-        if unsigned_psbt.is_none() {
-            return Err(Error::InsufficientBitcoins);
-        }
+        let unsigned_psbt = self.create_utxos_begin(online.clone(), up_to, num, size)?;
 
-        let mut psbt = PartiallySignedTransaction::from_str(&unsigned_psbt.expect("to be defined"))
-            .map_err(InternalError::from)?;
+        let mut psbt =
+            PartiallySignedTransaction::from_str(&unsigned_psbt).map_err(InternalError::from)?;
         self.bdk_wallet
             .sign(&mut psbt, SignOptions::default())
             .map_err(InternalError::from)?;
