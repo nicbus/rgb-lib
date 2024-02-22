@@ -27,6 +27,7 @@ jobs:
         env:
           RUSTFLAGS: "-Cinstrument-coverage"
           RUSTDOCFLAGS: "-Cinstrument-coverage"
+          LLVM_PROFILE_FILE: "target/coverage/%p-%m.profraw"
         run: cargo test
 
       - name: Install grcov
@@ -34,8 +35,8 @@ jobs:
 
       - name: Generate coverage report
         run: >
-          grcov . -s . --binary-path target/debug/ -t lcov --branch
-          --ignore-not-existing -o coverage.lcov
+          grcov target/coverage -s . --binary-path target/debug/ -t lcov --branch
+          --ignore 'target/*' --ignore 'tests/*' --ignore-not-existing -o coverage.lcov
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
