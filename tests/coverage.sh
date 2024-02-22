@@ -2,28 +2,39 @@
 #
 # script to run projects tests and report code coverage
 #
-# uses tarpaulin (https://crates.io/crates/cargo-tarpaulin)
-#
-# other coverage solutions exist but all require rust nightly and the project
-# does not build with nightly at the moment
+# uses grcov (https://github.com/mozilla/grcov)
 
-# install tarpaulin if missing
-cargo tarpaulin --help >/dev/null 2>&1 || cargo install cargo-tarpaulin
+COVERAGE_DIR="target/coverage"
 
+_tit() {
+    echo
+    echo "========================================"
+    echo "$@"
+    echo "========================================"
+}
+
+_tit "installing requirements"
+rustup component add llvm-tools-preview
+cargo install grcov
+
+_tit "gathering coverage info"
+# enable code coverage instrumentation and set per-test profile file name
+export RUSTFLAGS="-Cinstrument-coverage"
+export RUSTDOCFLAGS="-Cinstrument-coverage"
+export LLVM_PROFILE_FILE="$COVERAGE_DIR/%p-%m.profraw"
 # run tests
-# --skip-clean to avoid re-building everything each time
-cargo tarpaulin \
-    --count \
-    --line \
-    --locked \
-    --skip-clean \
-    --ignore-tests \
-    --exclude-files rgb-lib-ffi/ \
-    --exclude-files tests/ \
-    --exclude-files src/wallet/test/ \
-    --out Html \
-        -- \
-        --test-threads=1
+rm -rf $COVERAGE_DIR && mkdir -p $COVERAGE_DIR
+cargo test --no-fail-fast || true
 
-# open the html test report in the default browser
-xdg-open tarpaulin-report.html
+_tit "generating coverage report"
+grcov $COVERAGE_DIR \
+    -s . \
+    --binary-path target/debug/ \
+    --output-types html \
+    --branch \
+    --ignore 'target/*' \
+    --ignore-not-existing \
+    -o $COVERAGE_DIR/
+
+## show html report location
+echo "generated html report: $COVERAGE_DIR/html/index.html"
