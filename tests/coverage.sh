@@ -1,10 +1,15 @@
 #!/bin/bash -e
 #
-# script to run projects tests and report code coverage
-#
-# uses grcov (https://github.com/mozilla/grcov)
+# script to run project tests and report code coverage
+# uses llvm-cov (https://github.com/taiki-e/cargo-llvm-cov)
 
-COVERAGE_DIR="target/coverage"
+LLVM_COV_OPTS=""
+CARGO_TEST_OPTS=""
+
+_die() {
+    echo "err $*"
+    exit 1
+}
 
 _tit() {
     echo
@@ -13,28 +18,44 @@ _tit() {
     echo "========================================"
 }
 
+help() {
+    echo "$NAME [-h|--help] [-t|--test] [--no-clean]"
+    echo ""
+    echo "options:"
+    echo "    -h --help     show this help message"
+    echo "    -t --test     only run these test(s)"
+    echo "       --no-clean don't cleanup before the run"
+}
+
+# cmdline arguments
+while [ -n "$1" ]; do
+    case $1 in
+        -h|--help)
+            help
+            exit 0
+            ;;
+        -t|--test)
+            CARGO_TEST_OPTS="-- $2"
+            shift
+            ;;
+        --no-clean)
+            LLVM_COV_OPTS="$1"
+            ;;
+        *)
+            help
+            _die "unsupported argument \"$1\""
+            ;;
+    esac
+    shift
+done
+
 _tit "installing requirements"
 rustup component add llvm-tools-preview
-cargo install grcov
-
-_tit "gathering coverage info"
-# enable code coverage instrumentation and set per-test profile file name
-export RUSTFLAGS="-Cinstrument-coverage"
-export RUSTDOCFLAGS="-Cinstrument-coverage"
-export LLVM_PROFILE_FILE="$COVERAGE_DIR/%p-%m.profraw"
-# run tests
-rm -rf $COVERAGE_DIR && mkdir -p $COVERAGE_DIR
-cargo test --no-fail-fast || true
+cargo install cargo-llvm-cov
 
 _tit "generating coverage report"
-grcov $COVERAGE_DIR \
-    -s . \
-    --binary-path target/debug/ \
-    --output-types html \
-    --branch \
-    --ignore 'target/*' \
-    --ignore-not-existing \
-    -o $COVERAGE_DIR/
+# shellcheck disable=2086
+cargo llvm-cov --html $LLVM_COV_OPTS $CARGO_TEST_OPTS
 
 ## show html report location
-echo "generated html report: $COVERAGE_DIR/html/index.html"
+echo "generated html report: target/llvm-cov/html/index.html"
