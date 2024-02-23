@@ -23,9 +23,12 @@ jobs:
           toolchain: stable
 
       - name: Install llvm-cov
-        run: cargo install cargo-llvm-cov
+        env:
+          LLVM_COV_RELEASES: https://github.com/taiki-e/cargo-llvm-cov/releases
+        run: |
+          host=$(rustc -Vv | grep host | sed 's/host: //')
+          curl -fsSL $LLVM_COV_RELEASES/latest/download/cargo-llvm-cov-$host.tar.gz | tar xzf - -C "$HOME/.cargo/bin"
 
-      # TODO: exclude functions (e.g. down() in migrations)
       - name: Generate coverage report
         run: cargo llvm-cov --lcov --output-path coverage.lcov
 
