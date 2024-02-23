@@ -23,24 +23,11 @@ jobs:
           components: llvm-tools-preview
           toolchain: stable
 
-      #- name: Run tests
-      #  env:
-      #    CARGO_INCREMENTAL: "0"
-      #    LLVM_PROFILE_FILE: "target/coverage/%p-%m.profraw"
-      #    RUSTDOCFLAGS: "-Cinstrument-coverage"
-      #    RUSTFLAGS: "-Cinstrument-coverage"
-      #  run: cargo test issue
-
       - name: Install llvm-cov
         run: cargo install cargo-llvm-cov
 
       - name: Generate coverage report
-        run: >
-          cargo llvm-cov --lcov --output-path coverage.lcov -- respect_max_allocations
-          #grcov target/coverage/ -s . --binary-path target/debug/ -t lcov --branch
-          #--ignore '/home/runner/work/rgb-lib/rgb-lib' --ignore '.' --ignore '../*' --ignore 'target/*' --ignore 'tests/*' --ignore-not-existing -o coverage.lcov
-        #run: grcov . --binary-path target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
-
+        run: cargo llvm-cov --lcov --output-path coverage.lcov
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
