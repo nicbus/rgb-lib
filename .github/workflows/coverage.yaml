@@ -42,7 +42,7 @@ jobs:
       - name: Generate coverage report
         run: >
           grcov target/coverage/ -s . --binary-path target/debug/ -t lcov --branch
-          --ignore '.' --ignore '../*' --ignore 'target/*' --ignore 'tests/*' --ignore-not-existing -o coverage.lcov
+          --ignore '/home/runner/work/rgb-lib/rgb-lib' --ignore '.' --ignore '../*' --ignore 'target/*' --ignore 'tests/*' --ignore-not-existing -o coverage.lcov
         #run: grcov . --binary-path target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
 
 
