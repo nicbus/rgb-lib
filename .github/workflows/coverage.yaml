@@ -21,14 +21,12 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: rustfmt, llvm-tools-preview
-          override: true
-          profile: minimal
           toolchain: stable
 
       - name: Run tests
         env:
           CARGO_INCREMENTAL: "0"
-          #LLVM_PROFILE_FILE: "target/coverage/%p-%m.profraw"
+          LLVM_PROFILE_FILE: "target/coverage/%p-%m.profraw"
           RUSTDOCFLAGS: "-Cinstrument-coverage"
           RUSTFLAGS: "-Cinstrument-coverage"
         run: cargo test issue
@@ -36,11 +34,16 @@ jobs:
       - name: Install grcov
         run: cargo install grcov
 
+      - name: debug
+        run: |
+          pwd
+          ls -hAl
+
       - name: Generate coverage report
-        #run: >
-        #  grcov target/coverage -s . --binary-path target/debug/ -t lcov --branch
-        #  --ignore 'target/*' --ignore 'tests/*' --ignore-not-existing -o coverage.lcov
-        run: grcov . --binary-path target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
+        run: >
+          grcov target/coverage/ -s . --binary-path target/debug/ -t lcov --branch
+          --ignore '../*' --ignore 'target/*' --ignore 'tests/*' --ignore-not-existing -o coverage.lcov
+        #run: grcov . --binary-path target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
 
 
       - name: Upload coverage report
