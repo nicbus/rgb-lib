@@ -26,6 +26,7 @@ jobs:
       - name: Install llvm-cov
         run: cargo install cargo-llvm-cov
 
+      # TODO: exclude functions (e.g. down() in migrations)
       - name: Generate coverage report
         run: cargo llvm-cov --lcov --output-path coverage.lcov
 
