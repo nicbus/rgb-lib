@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "cross_platform_GH_actions" ]
   pull_request:
     branches: [ "master" ]
 
