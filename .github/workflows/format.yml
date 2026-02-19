@@ -20,6 +20,9 @@ jobs:
           components: rustfmt
       - name: Format
         run: cargo fmt --all -- --check
+      - name: Format migration crate
+        working-directory: ./migrations
+        run: cargo fmt --all -- --check
       - name: Format c-ffi bindings
         working-directory: ./bindings/c-ffi
         run: |
