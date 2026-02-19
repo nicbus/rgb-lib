@@ -33,7 +33,7 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-pub enum Asset {
+pub  enum Asset {
     Table,
     RejectListUrl,
 }
