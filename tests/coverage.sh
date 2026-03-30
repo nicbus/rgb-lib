@@ -66,7 +66,9 @@ rustup component add llvm-tools-preview
 cargo install cargo-llvm-cov
 
 _tit "generating coverage report"
-IGNORE_PATTERN="/rgb\-lib(/.*)?/(tests|examples|benches|migration/src/main.rs|src/database/entities|src/wallet/test)($|/)|/rgb\-lib/target/llvm\-cov\-target($|/)|^$HOME/\.cargo/(registry|git)/|^$HOME/\.rustup/toolchains($|/)"
+# note: LLVM's extended regex implementation is strict and does not backtrack,
+#       so in the greedy (/.*)? the leftmost-longest match wins
+IGNORE_PATTERN="/rgb-lib(/.*)?/(tests|examples|benches)($|/)|/rgb-lib/(migration/src/main[.]rs|src/database/entities|src/wallet/test|target/llvm-cov-target)($|/)|^$HOME/[.]cargo/(registry|git)/|^$HOME/[.]rustup/toolchains($|/)"
 $COV --html \
     --ignore-filename-regex "$IGNORE_PATTERN" \
     "${LLVM_COV_OPTS[@]}" "${CARGO_TEST_OPTS[@]}" --include-ignored
