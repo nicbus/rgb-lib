@@ -126,7 +126,7 @@ fn testnet4_success() {
     assert_eq!(wallet.get_wallet_data().bitcoin_network, bitcoin_network);
 }
 
-#[cfg(all(feature = "electrum", feature = "esplora"))]
+#[cfg(feature = "electrum")]
 #[test]
 #[parallel]
 fn mainnet_success() {
