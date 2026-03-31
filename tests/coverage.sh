@@ -5,7 +5,7 @@
 
 LLVM_COV_OPTS=()
 CARGO_TEST_OPTS=("--")
-COV="cargo llvm-cov --workspace --all-features"
+COV="cargo llvm-cov --verbose --workspace --all-features"
 
 _die() {
     echo "err $*"
@@ -66,18 +66,8 @@ rustup component add llvm-tools-preview
 cargo install cargo-llvm-cov
 
 _tit "generating coverage report"
-# note: LLVM's extended regex implementation is strict and does not backtrack,
-#       so in the greedy (/.*)? the leftmost-longest match wins
-IGNORE_LIST=(
-    # directories that may appear at different depths
-    "/rgb\-lib(/.*)?/(tests|examples|benches)($|/)"
-    # specific files or directories anchored to the project root
-    "/rgb\-lib/(migration/src/main\.rs|src/database/entities|src/wallet/test|target/llvm\-cov\-target)($|/)"
-    # external dependencies
-    "^$HOME/\.cargo/(registry|git)/"
-    "^$HOME/\.rustup/toolchains/)"
-)
-IGNORE_PATTERN=$(IFS="|"; echo "${IGNORE_LIST[*]}")
+# note: llvm-cov adds patterns for common paths to ignore
+IGNORE_PATTERN='/rgb\-lib/(migration/src/main\.rs|src/database/entities|src/wallet/test|target/llvm\-cov\-target)($|/)'
 $COV --html \
     --ignore-filename-regex "$IGNORE_PATTERN" \
     "${LLVM_COV_OPTS[@]}" "${CARGO_TEST_OPTS[@]}" --include-ignored
